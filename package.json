@@ -7,7 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "author": "",
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/trungthanh-tran/kidcareshop-fb-bot.git"
+  },
+  "author": "trungthanh.tran@live.com",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
