@@ -1,7 +1,7 @@
 'use strict'
 const
   util = require('util'),
-  FacebookItem = require("./facebook_item.js")
+  FacebookItem = require("./item.js")
 // Facebook Text item
 module.exports = class FacebookTextElement extends FacebookItem {
   constructor(_value) {
