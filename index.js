@@ -2,7 +2,7 @@
 
 const
   express = require("express"),
-  request = require('request'),
+  request = require('request-promise'),
   bodyParser = require("body-parser"),
   PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN,
   app = express().use(bodyParser.json()) // Create express http
@@ -128,16 +128,15 @@ function callSendAPI(sender_psid, response) {
     "message": response
   }
 
-  request({
+
+request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
     "qs": { "access_token": PAGE_ACCESS_TOKEN },
     "method": "POST",
     "json": request_body
-  }, (err, res, body) => {
-    if (!err) {
-      console.log('message sent!')
-    } else {
-      console.error("Unable to send message:" + err);
-    }
+  }).then(function(body){
+    console.log('message sent!');
+  }).catch(function(err){
+    console.error("Unable to send message:" + err);
   });
 }
