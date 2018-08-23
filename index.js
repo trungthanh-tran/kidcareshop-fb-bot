@@ -5,7 +5,14 @@ const
   request = require('request-promise'),
   bodyParser = require("body-parser"),
   PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN,
+  FacebookTextElement = require("./model/facebook_text.js"),
+  FacebookButtonElement = require("./model/facebook_button.js"),
+  FacebookButtonTemplate = require("./model/facebook_button_template.js"),
+  LAZADA_BUTTON = new FacebookButtonElement("postback","Lazada website","lazada"),
+  SHOPEE_BUTTON = new FacebookButtonElement("postback","Shopee website","shopee"),
+  TELEPHONE_BUTTON = new FacebookButtonElement("postback","Telephone number","telephone"),
   app = express().use(bodyParser.json()) // Create express http
+
 
 app.listen(process.env.PORT || 1337, () => console.log("Hello world"))
 
@@ -16,11 +23,7 @@ app.post("/webhook", (req, res) => {
     body.entry.forEach( function(entry) {
         let webhook_event = entry.messaging[0];
         console.log(webhook_event);
-
-        // Get sender
         let sender_psid = webhook_event.sender.id;
-        console.log('Sender PSID: ' + sender_psid);
-
         if (webhook_event.message) {
           handleMessage(sender_psid, webhook_event.message);
         } else if(webhook_event.postback) {
@@ -58,19 +61,27 @@ function handleMessage(sender_psid, received_message) {
   let lazada = "lazada";
   let shopee = "shopee";
   let website = "website";
+  let list = "list";
   if (received_message.text) {
     let text_message = received_message.text.toLowerCase();
     let responseText;
-    if (text_message.indexOf(lazada) !== -1) {
-      responseText = "Địa chỉ Lazada là https://lazada.vn/shop/kidcareshop";
+    if (text_message.indexOf("list") !== -1) {
+      // Send website list
+      var buttonList = [];
+      buttonList.push(LAZADA_BUTTON);
+      buttonList.push(SHOPEE_BUTTON);
+      buttonList.push(TELEPHONE_BUTTON);
+      responseText = new FacebookButtonTemplate("eCommerce kidcareshop", buttonList);
+    } else if (text_message.indexOf(lazada) !== -1) {
+      responseText = new FacebookTextElement("Địa chỉ Lazada là https://lazada.vn/shop/kidcareshop");
     } else if (text_message.indexOf(shopee) !== -1) {
-      responseText = "Địa chỉ Shopee là https://shopee.vn/shop/kidcareshop";
+      responseText = new FacebookTextElement("Địa chỉ Shopee là https://shopee.vn/shop/kidcareshop");
     } else if (text_message.match(/sdt|số điện thoại|so dien thoai/)) {
-      responseText = "08 88 58 18 00";
+      responseText = new FacebookTextElement("08 88 58 18 00");
     } else {
       return;
     }
-    response = {"text": responseText};
+    response = responseText.buildItem();
   } else if (received_message.attachments) {
     let attachment_url = received_message.attachments[0].payload.url;
     response = {
@@ -129,14 +140,15 @@ function callSendAPI(sender_psid, response) {
   }
 
 
-request({
+  request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
     "qs": { "access_token": PAGE_ACCESS_TOKEN },
     "method": "POST",
     "json": request_body
-  }).then(function(body){
-    console.log('message sent!');
-  }).catch(function(err){
-    console.error("Unable to send message:" + err);
-  });
+    }).then(function(body){
+      console.log('message sent!');
+    }).catch(function(err){
+      console.error("Send error");
+    }
+  );
 }
