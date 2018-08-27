@@ -1,8 +1,6 @@
 'use strict'
-const
-  util = require('util')
 
-module.exports = class FacebookItem {
+export default class FacebookItem {
   /*static checkEnforceAbstractFuctions(object) {
     // Abstract class
     var abstractFunctions = ['buildItem'];

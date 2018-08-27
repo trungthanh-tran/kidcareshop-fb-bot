@@ -1,9 +1,7 @@
 'use strict'
-const
-  util = require('util'),
-  FacebookItem = require("./item.js")
+import FacebookItem from "./item";
 // Facebook Text item
-module.exports = class FacebookButtonElement extends FacebookItem {
+export default class FacebookButtonElement extends FacebookItem {
   constructor(buttonType, buttonTitle, buttonPayload) {
     super();
     this.type = buttonType;
